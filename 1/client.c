@@ -12,7 +12,6 @@ static char CHILD_PROGRAM_NAME[] = "child";
 int main() {
     char progpath[1024];
 	{
-		// NOTE: Read full program path, including its name
 		ssize_t len = readlink("/proc/self/exe", progpath,
 		                       sizeof(progpath) - 1);
 		if (len == -1) {
@@ -20,9 +19,7 @@ int main() {
 			write(STDERR_FILENO, msg, sizeof(msg));
 			exit(EXIT_FAILURE);
 		}
-
-		// NOTE: Trim the path to first slash from the end
-		while (progpath[len] != '/')
+        while (progpath[len] != '/')
 			--len;
 
 		progpath[len] = '\0';
@@ -56,7 +53,6 @@ int main() {
     } else if(child1 == 0) {
         {
 			pid_t pid = getpid(); // NOTE: Get child PID
-
 			char msg[64];
 			const int32_t length = snprintf(msg, sizeof(msg),
 				"%d: I'm a child\n", pid);
@@ -137,7 +133,7 @@ int main() {
             exit(EXIT_FAILURE);
         }
         write(pipe1[1], buf, sz);
-        sz = read(pipe2[0], buf, sizeof(buf)); // ?
+        sz = read(pipe2[0], buf, sizeof(buf)); 
         write(STDOUT_FILENO, buf, sz);
     }
     close(pipe1[1]);
