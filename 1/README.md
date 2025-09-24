@@ -1,6 +1,6 @@
 # OS_labs
 Компиляция
-cc -o client client.c
+cc -o client client.c \
 cc -o child child.c
 
 Задание Вариант 14
