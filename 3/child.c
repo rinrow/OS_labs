@@ -1,8 +1,10 @@
 #include <fcntl.h>
 #include <stdint.h>
 #include <stdbool.h>
+#include <ctype.h>
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <errno.h>
 
@@ -16,13 +18,13 @@
 
 int main(int argc, const char **argv) {
     bool first = argv[1][0] - '0';
-
     int shm = shm_open(argv[2], O_RDWR, 0);
     if (shm == -1) {
 		const char msg[] = "error: failed to open SHM\n";
 		write(STDERR_FILENO, msg, sizeof(msg));
 		_exit(EXIT_FAILURE);
 	}
+    
     char *shm_buf = mmap(NULL, SHM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, shm, 0);
     if (shm_buf == MAP_FAILED) {
 		const char msg[] = "error: failed to map SHM\n";
@@ -36,30 +38,41 @@ int main(int argc, const char **argv) {
 		write(STDERR_FILENO, msg, sizeof(msg));
 		_exit(EXIT_FAILURE);
 	}
+
     int *stage = (int *)(shm_buf + sizeof(uint32_t));
     uint32_t *len = (uint32_t *)shm_buf;
     char *text = shm_buf + sizeof(uint32_t) + sizeof(int);
+    
     char nbuf[4096];
-    while(1) {
+    while(true) {
         // преобразить buf
         sem_wait(sem);
+        if(*len == UINT32_MAX) { 
+            sem_post(sem);            
+            break;
+        }
         if(first) { // child 1
             if(*stage == 1) {
                 for(size_t i = 0; i < *len; ++i) text[i] = tolower(text[i]);
                 *stage = 2; // дальше child2
             }
         } else { // child 2
-            size_t nsz = 0;
-            for(size_t i = 0; i < *len; ++i) {
-                if(text[i] != ' ' || i == *len - 1 || text[i + 1] != ' ') {
-                    nbuf[nsz++] = text[i];
+            if(*stage == 2) {
+                size_t nsz = 0;
+                for(size_t i = 0; i < *len; ++i) {
+                    if(text[i] != ' ' || i == *len - 1 || text[i + 1] != ' ') {
+                        nbuf[nsz++] = text[i];
+                    }
                 }
+                *len = nsz;
+                memcpy(text, nbuf, *len);
+                *stage = 3;
             }
-            *len = nsz;
-            memcpy(text, nbuf, *len);
-            *stage = 3;
         }
         sem_post(sem);
     }
+    sem_close(sem);
+	munmap(shm_buf, SHM_SIZE);
+	close(shm);
     return 0;
 }
