@@ -94,50 +94,50 @@ int main() {
     double ts, curT;
     printf("Total thread count %lu\n\n", tn);
     printf("First matrix size (%d * %d), second matrix size (%d * %d)\n\n", N, M, M, N);
-    // {
-    // // experiment consistent
-    // printf("===== experiment consistent =====\n");
-    // clock_gettime(CLOCK_MONOTONIC, &st);
-    // consistent();
-    // clock_gettime(CLOCK_MONOTONIC, &end);
-    // ts = getDif(st, end);
-    // curT = getDif(st, end);
-    // printf("Time : %lf ms. Acceleration %lf . Efficiency %lf\n", curT, ts / curT, ts / curT / 1);
-    // printf("\n\n");
+    {
+    // experiment consistent
+    printf("===== experiment consistent =====\n");
+    clock_gettime(CLOCK_MONOTONIC, &st);
+    consistent();
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    ts = getDif(st, end);
+    curT = getDif(st, end);
+    printf("Time : %lf ms. Acceleration %lf . Efficiency %lf\n", curT, ts / curT, ts / curT / 1);
+    printf("\n\n");
 
-    // // experiment Paralel <= tn
-    // printf("===== experiment Paralel threads < logic Thread =====\n");
-    // for(int i = 1; i < tn; ++i) {
-    //     clock_gettime(CLOCK_MONOTONIC, &st);
-    //     paralel(i);
-    //     clock_gettime(CLOCK_MONOTONIC, &end);
-    //     curT = getDif(st, end);
-    //     printf("ThreadsCount %d . Time : %lf ms. Acceleration %lf . Efficiency %lf\n", 
-    //             i, curT, ts / curT, ts / curT / i);
-    // }
-    // printf("\n\n");
+    // experiment Paralel <= tn
+    printf("===== experiment Paralel threads < logic Thread =====\n");
+    for(int i = 1; i < tn; ++i) {
+        clock_gettime(CLOCK_MONOTONIC, &st);
+        paralel(i);
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        curT = getDif(st, end);
+        printf("ThreadsCount %d . Time : %lf ms. Acceleration %lf . Efficiency %lf\n", 
+                i, curT, ts / curT, ts / curT / i);
+    }
+    printf("\n\n");
 
-    // printf("===== experiment threads = logic threads =====\n");
-    // clock_gettime(CLOCK_MONOTONIC, &st);
-    // paralel(tn);
-    // clock_gettime(CLOCK_MONOTONIC, &end);
-    // curT = getDif(st, end);
-    // printf("ThreadsCount %d . Time : %lf ms. Acceleration %lf . Efficiency %lf\n", 
-    //             tn, curT, ts / curT, ts / curT / tn);
-    // printf("\n\n");
+    printf("===== experiment threads = logic threads =====\n");
+    clock_gettime(CLOCK_MONOTONIC, &st);
+    paralel(tn);
+    clock_gettime(CLOCK_MONOTONIC, &end);
+    curT = getDif(st, end);
+    printf("ThreadsCount %d . Time : %lf ms. Acceleration %lf . Efficiency %lf\n", 
+                tn, curT, ts / curT, ts / curT / tn);
+    printf("\n\n");
 
-    // int bigCnt[3] = {16, 32, 1024};
-    // printf("===== experiment threads > logic threads =====\n");
-    // for(int i = 0; i < 3; ++i) {
-    //     clock_gettime(CLOCK_MONOTONIC, &st);
-    //     paralel(bigCnt[i]);
-    //     clock_gettime(CLOCK_MONOTONIC, &end);
-    //     curT = getDif(st, end);
-    //     printf("ThreadsCount %d . Time : %lf ms. Acceleration %lf . Efficiency %lf\n", 
-    //             bigCnt[i], curT, ts / curT, ts / curT / bigCnt[i]);
-    // }
-    // printf("\n\n");
-    // }
+    int bigCnt[3] = {16, 32, 1024};
+    printf("===== experiment threads > logic threads =====\n");
+    for(int i = 0; i < 3; ++i) {
+        clock_gettime(CLOCK_MONOTONIC, &st);
+        paralel(bigCnt[i]);
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        curT = getDif(st, end);
+        printf("ThreadsCount %d . Time : %lf ms. Acceleration %lf . Efficiency %lf\n", 
+                bigCnt[i], curT, ts / curT, ts / curT / bigCnt[i]);
+    }
+    printf("\n\n");
+    }
     
     return 0;
 }
