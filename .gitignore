@@ -2,3 +2,8 @@
 child 
 client
 2/main.exe
+4/example_dynamic
+.gitignore
+4/libown1.so
+4/libown2.so
+4/example_static
